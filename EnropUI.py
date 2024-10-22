@@ -634,6 +634,7 @@ def change_f0_method(f0method8):
 with gr.Blocks(title="♡ Enrop") as app:
     gr.Markdown("♡ En UI")
     gr.Markdown(value=i18n("Guide Recommendations: (Enrops's) https://rentry.co/TrainingVoiceModels + (Litsa_the_dancer's) https://rentry.org/RVC_making-models"))
+    gr.Markdown(value=i18n("v2 is already selected when using this UI"))
     with gr.Tabs():
         with gr.TabItem(i18n("Train")):
             gr.Markdown(value=i18n(""))
