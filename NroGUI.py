@@ -631,216 +631,11 @@ def change_f0_method(f0method8):
         visible = False
     return {"visible": visible, "__type__": "update"}
 
-with gr.Blocks(title="♡ Enrop") as app:
-    gr.Markdown("♡ En UI")
+with gr.Blocks(title="🗣️ NroGUI") as app:
+    gr.Markdown("♡NroGUI")
     gr.Markdown(value=i18n("Guide Recommendations: (Enrops's) https://rentry.co/TrainingVoiceModels + (Litsa_the_dancer's) https://rentry.org/RVC_making-models"))
     gr.Markdown(value=i18n("v2 is already selected when using this UI"))
     with gr.Tabs():
-        with gr.TabItem(i18n("Train")):
-            gr.Markdown(value=i18n(""))
-            with gr.Row():
-                exp_dir1 = gr.Textbox(label=i18n("Model Name"), value="test-model")
-                sr2 = gr.Radio(
-                    label=i18n("Sample Rate"),
-                    choices=["32k", "40k", "48k"],
-                    value="32k",
-                    interactive=True,
-                )
-                if_f0_3 = gr.Radio(
-                    label=i18n("Pitch Guidance"),
-                    choices=[True, False],
-                    value=True,
-                    interactive=True,
-                )
-                version19 = gr.Radio(
-                    label=i18n("Version 2 only here"),
-                    choices=["v2"],
-                    value="v2",
-                    interactive=False,
-                    visible=False,
-                )
-                np7 = gr.Slider(
-                    minimum=0,
-                    maximum=config.n_cpu,
-                    step=1,
-                    label=i18n("CPU Threads"),
-                    value=int(np.ceil(config.n_cpu / 2.5)),
-                    interactive=True,
-                )
-            with gr.Group():
-                gr.Markdown(value=i18n(""))
-                with gr.Row():
-                    trainset_dir4 = gr.Textbox(
-                        label=i18n("Path to Dataset"), value="datasets"
-                    )
-                    spk_id5 = gr.Slider(
-                        minimum=0,
-                        maximum=4,
-                        step=1,
-                        label=i18n("Speaker id"),
-                        value=0,
-                        interactive=True,
-                    )
-                    but1 = gr.Button(i18n("Process Data"), variant="primary")
-                    info1 = gr.Textbox(label=i18n("Output"), value="")
-                    but1.click(
-                        preprocess_dataset,
-                        [trainset_dir4, exp_dir1, sr2, np7],
-                        [info1],
-                        api_name="train_preprocess",
-                    )
-            with gr.Group():
-                gr.Markdown(value=i18n(""))
-                with gr.Row():
-                    with gr.Column():
-                        gpus6 = gr.Textbox(
-                            label=i18n("GPU ID's ex: 0-2 Uses GPU's 0 & 2"),
-                            value=gpus,
-                            interactive=True,
-                            visible=F0GPUVisible,
-                        )
-                        gpu_info9 = gr.Textbox(
-                            label=i18n("GPU Information"),
-                            value=gpu_info,
-                            visible=F0GPUVisible,
-                        )
-                    with gr.Column():
-                        f0method8 = gr.Radio(
-                            label=i18n("RMVPE only"),
-                            choices=["rmvpe", "rmvpe_gpu"],
-                            value="rmvpe_gpu",
-                            interactive=True,
-                        )
-                        gpus_rmvpe = gr.Textbox(
-                            label=i18n(
-                                "0-0-2 runs TWO processes on GPU 0 & ONE on GPU 2 (rmvpe_gpu)"
-                            ),
-                            value="%s-%s" % (gpus, gpus),
-                            interactive=True,
-                            visible=F0GPUVisible,
-                        )
-                    but2 = gr.Button(i18n("Feature Extraction"), variant="primary")
-                    info2 = gr.Textbox(label=i18n("Output"), value="", max_lines=8)
-                    f0method8.change(
-                        fn=change_f0_method,
-                        inputs=[f0method8],
-                        outputs=[gpus_rmvpe],
-                    )
-                    but2.click(
-                        extract_f0_feature,
-                        [
-                            gpus6,
-                            np7,
-                            f0method8,
-                            if_f0_3,
-                            exp_dir1,
-                            version19,
-                            gpus_rmvpe,
-                        ],
-                        [info2],
-                        api_name="train_extract_f0_feature",
-                    )
-            with gr.Group():
-                gr.Markdown(value=i18n(""))
-                with gr.Row():
-                    save_epoch10 = gr.Slider(
-                        minimum=1,
-                        maximum=250,
-                        step=1,
-                        label=i18n("Save frequency"),
-                        value=25,
-                        interactive=True,
-                    )
-                    total_epoch11 = gr.Slider(
-                        minimum=2,
-                        maximum=10000,
-                        step=1,
-                        label=i18n("Total Epochs"),
-                        value=800,
-                        interactive=True,
-                    )
-                    batch_size12 = gr.Slider(
-                        minimum=1,
-                        maximum=16,
-                        step=1,
-                        label=i18n("Batch Size"),
-                        value=default_batch_size,
-                        interactive=True,
-                    )
-                    if_save_latest13 = gr.Radio(
-                        label=i18n("Save last ckpt as final Model"),
-                        choices=[i18n("是"), i18n("否")],
-                        value=i18n("是"),
-                        interactive=True,
-                    )
-                    if_cache_gpu17 = gr.Radio(
-                        label=i18n("Cache data to GPU"),
-                        choices=[i18n("是"), i18n("否")],
-                        value=i18n("否"),
-                        interactive=True,
-                    )
-                    if_save_every_weights18 = gr.Radio(
-                        label=i18n("Create model at save frequency"),
-                        choices=[i18n("是"), i18n("否")],
-                        value=i18n("是"),
-                        interactive=True,
-                    )
-                with gr.Row():
-                    pretrained_G14 = gr.Textbox(
-                        label=i18n("Pretrained G"),
-                        value="assets/pretrained_v2/f0G32k.pth",
-                        interactive=True,
-                    )
-                    pretrained_D15 = gr.Textbox(
-                        label=i18n("Pretrained D"),
-                        value="assets/pretrained_v2/f0D32k.pth",
-                        interactive=True,
-                    )
-                    sr2.change(
-                        change_sr2,
-                        [sr2, if_f0_3, version19],
-                        [pretrained_G14, pretrained_D15],
-                    )
-                    version19.change(
-                        change_version19,
-                        [sr2, if_f0_3, version19],
-                        [pretrained_G14, pretrained_D15, sr2],
-                    )
-                    if_f0_3.change(
-                        change_f0,
-                        [if_f0_3, sr2, version19],
-                        [f0method8, gpus_rmvpe, pretrained_G14, pretrained_D15],
-                    )
-                    gpus16 = gr.Textbox(
-                        label=i18n("Enter cards to be used EX: 0-1"),
-                        value=gpus,
-                        interactive=True,
-                    )
-                    but3 = gr.Button(i18n("Train Model"), variant="primary")
-                    but4 = gr.Button(i18n("Train Index"), variant="primary")
-                    info3 = gr.Textbox(label=i18n("Output"), value="", max_lines=10)
-                    but3.click(
-                        click_train,
-                        [
-                            exp_dir1,
-                            sr2,
-                            if_f0_3,
-                            spk_id5,
-                            save_epoch10,
-                            total_epoch11,
-                            batch_size12,
-                            if_save_latest13,
-                            pretrained_G14,
-                            pretrained_D15,
-                            gpus16,
-                            if_cache_gpu17,
-                            if_save_every_weights18,
-                            version19,
-                        ],
-                        info3,
-                        api_name="train_start",
-                    )
-                    but4.click(train_index, [exp_dir1, version19], info3)
         with gr.TabItem(i18n("Inference")):
             with gr.Row():
                 sid0 = gr.Dropdown(label=i18n("Voice"), choices=sorted(names))
@@ -1092,6 +887,212 @@ with gr.Blocks(title="♡ Enrop") as app:
                     api_name="infer_change_voice",
                 )
 
+        with gr.TabItem(i18n("Train")):
+            gr.Markdown(value=i18n(""))
+            with gr.Row():
+                exp_dir1 = gr.Textbox(label=i18n("Model Name"), value="test-model")
+                sr2 = gr.Radio(
+                    label=i18n("Sample Rate"),
+                    choices=["32k", "40k", "48k"],
+                    value="32k",
+                    interactive=True,
+                )
+                if_f0_3 = gr.Radio(
+                    label=i18n("Pitch Guidance"),
+                    choices=[True, False],
+                    value=True,
+                    interactive=True,
+                )
+                version19 = gr.Radio(
+                    label=i18n("Version 2 only here"),
+                    choices=["v2"],
+                    value="v2",
+                    interactive=False,
+                    visible=False,
+                )
+                np7 = gr.Slider(
+                    minimum=0,
+                    maximum=config.n_cpu,
+                    step=1,
+                    label=i18n("CPU Threads"),
+                    value=int(np.ceil(config.n_cpu / 2.5)),
+                    interactive=True,
+                )
+            with gr.Group():
+                gr.Markdown(value=i18n(""))
+                with gr.Row():
+                    trainset_dir4 = gr.Textbox(
+                        label=i18n("Path to Dataset"), value="datasets"
+                    )
+                    spk_id5 = gr.Slider(
+                        minimum=0,
+                        maximum=4,
+                        step=1,
+                        label=i18n("Speaker id"),
+                        value=0,
+                        interactive=True,
+                    )
+                    but1 = gr.Button(i18n("Process Data"), variant="primary")
+                    info1 = gr.Textbox(label=i18n("Output"), value="")
+                    but1.click(
+                        preprocess_dataset,
+                        [trainset_dir4, exp_dir1, sr2, np7],
+                        [info1],
+                        api_name="train_preprocess",
+                    )
+            with gr.Group():
+                gr.Markdown(value=i18n(""))
+                with gr.Row():
+                    with gr.Column():
+                        gpus6 = gr.Textbox(
+                            label=i18n("GPU ID's ex: 0-2 Uses GPU's 0 & 2"),
+                            value=gpus,
+                            interactive=True,
+                            visible=F0GPUVisible,
+                        )
+                        gpu_info9 = gr.Textbox(
+                            label=i18n("GPU Information"),
+                            value=gpu_info,
+                            visible=F0GPUVisible,
+                        )
+                    with gr.Column():
+                        f0method8 = gr.Radio(
+                            label=i18n("RMVPE only"),
+                            choices=["rmvpe", "rmvpe_gpu"],
+                            value="rmvpe_gpu",
+                            interactive=True,
+                        )
+                        gpus_rmvpe = gr.Textbox(
+                            label=i18n(
+                                "0-0-2 runs TWO processes on GPU 0 & ONE on GPU 2 (rmvpe_gpu)"
+                            ),
+                            value="%s-%s" % (gpus, gpus),
+                            interactive=True,
+                            visible=F0GPUVisible,
+                        )
+                    but2 = gr.Button(i18n("Feature Extraction"), variant="primary")
+                    info2 = gr.Textbox(label=i18n("Output"), value="", max_lines=8)
+                    f0method8.change(
+                        fn=change_f0_method,
+                        inputs=[f0method8],
+                        outputs=[gpus_rmvpe],
+                    )
+                    but2.click(
+                        extract_f0_feature,
+                        [
+                            gpus6,
+                            np7,
+                            f0method8,
+                            if_f0_3,
+                            exp_dir1,
+                            version19,
+                            gpus_rmvpe,
+                        ],
+                        [info2],
+                        api_name="train_extract_f0_feature",
+                    )
+            with gr.Group():
+                gr.Markdown(value=i18n(""))
+                with gr.Row():
+                    save_epoch10 = gr.Slider(
+                        minimum=1,
+                        maximum=250,
+                        step=1,
+                        label=i18n("Save frequency"),
+                        value=25,
+                        interactive=True,
+                    )
+                    total_epoch11 = gr.Slider(
+                        minimum=2,
+                        maximum=10000,
+                        step=1,
+                        label=i18n("Total Epochs"),
+                        value=800,
+                        interactive=True,
+                    )
+                    batch_size12 = gr.Slider(
+                        minimum=1,
+                        maximum=16,
+                        step=1,
+                        label=i18n("Batch Size"),
+                        value=default_batch_size,
+                        interactive=True,
+                    )
+                    if_save_latest13 = gr.Radio(
+                        label=i18n("Save last ckpt as final Model"),
+                        choices=[i18n("是"), i18n("否")],
+                        value=i18n("是"),
+                        interactive=True,
+                    )
+                    if_cache_gpu17 = gr.Radio(
+                        label=i18n("Cache data to GPU"),
+                        choices=[i18n("是"), i18n("否")],
+                        value=i18n("否"),
+                        interactive=True,
+                    )
+                    if_save_every_weights18 = gr.Radio(
+                        label=i18n("Create model at save frequency"),
+                        choices=[i18n("是"), i18n("否")],
+                        value=i18n("是"),
+                        interactive=True,
+                    )
+                with gr.Row():
+                    pretrained_G14 = gr.Textbox(
+                        label=i18n("Pretrained G"),
+                        value="assets/pretrained_v2/f0G32k.pth",
+                        interactive=True,
+                    )
+                    pretrained_D15 = gr.Textbox(
+                        label=i18n("Pretrained D"),
+                        value="assets/pretrained_v2/f0D32k.pth",
+                        interactive=True,
+                    )
+                    sr2.change(
+                        change_sr2,
+                        [sr2, if_f0_3, version19],
+                        [pretrained_G14, pretrained_D15],
+                    )
+                    version19.change(
+                        change_version19,
+                        [sr2, if_f0_3, version19],
+                        [pretrained_G14, pretrained_D15, sr2],
+                    )
+                    if_f0_3.change(
+                        change_f0,
+                        [if_f0_3, sr2, version19],
+                        [f0method8, gpus_rmvpe, pretrained_G14, pretrained_D15],
+                    )
+                    gpus16 = gr.Textbox(
+                        label=i18n("Enter cards to be used EX: 0-1"),
+                        value=gpus,
+                        interactive=True,
+                    )
+                    but3 = gr.Button(i18n("Train Model"), variant="primary")
+                    but4 = gr.Button(i18n("Train Index"), variant="primary")
+                    info3 = gr.Textbox(label=i18n("Output"), value="", max_lines=10)
+                    but3.click(
+                        click_train,
+                        [
+                            exp_dir1,
+                            sr2,
+                            if_f0_3,
+                            spk_id5,
+                            save_epoch10,
+                            total_epoch11,
+                            batch_size12,
+                            if_save_latest13,
+                            pretrained_G14,
+                            pretrained_D15,
+                            gpus16,
+                            if_cache_gpu17,
+                            if_save_every_weights18,
+                            version19,
+                        ],
+                        info3,
+                        api_name="train_start",
+                    )
+                    but4.click(train_index, [exp_dir1, version19], info3)
+        
     if config.iscolab:
         app.queue(concurrency_count=511, max_size=1022).launch(share=True)
     else:
