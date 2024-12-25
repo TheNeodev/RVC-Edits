@@ -18,4 +18,4 @@ However in doing so, anyone must be able to use the changes as well. Open Source
 
 # Releases
 V1.0 is when this was still called RavenUI
-V2.0 on is when Enrop name will take over, or you can just Git Clone and have the slightly updated ver.
+V2.0 on is when (Enrop) NroGUI name will take over, or you can just Git Clone and have the slightly updated ver.
