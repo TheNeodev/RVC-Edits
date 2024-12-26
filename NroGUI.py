@@ -25,7 +25,8 @@ import threading
 import shutil
 import logging
 from dotenv import load_dotenv
-
+import shutil, time, torch, gc
+from mega import Mega
 now_dir = os.getcwd()
 sys.path.append(now_dir)
 load_dotenv()
@@ -631,17 +632,101 @@ def change_f0_method(f0method8):
         visible = False
     return {"visible": visible, "__type__": "update"}
 
+
+
+def show(path,ext,on_error=None):
+    try:
+        return list(filter(lambda x: x.endswith(ext), os.listdir(path)))
+    except:
+        return on_error
+    
+def run_subprocess(command):
+    try:
+        subprocess.run(command, check=True)
+        return True, None
+    except Exception as e:
+        return False, e
+        
+def download_from_url(url=None, model=None):
+    if not url:
+        try:
+            url = model[f'{model}']
+        except:
+            gr.Warning("Failed")
+            return ''
+    if model == '':
+        try:
+            model = url.split('/')[-1].split('?')[0]
+        except:
+            gr.Warning('Please name the model')
+            return
+    model = model.replace('.pth', '').replace('.index', '').replace('.zip', '')
+    url = url.replace('/blob/main/', '/resolve/main/').strip()
+
+    for directory in ["downloads", "unzips","zip"]:
+        #shutil.rmtree(directory, ignore_errors=True)
+        os.makedirs(directory, exist_ok=True)
+
+    try:
+        if url.endswith('.pth'):
+            subprocess.run(["wget", url, "-O", f'assets/weights/{model}.pth'])
+        elif url.endswith('.index'):
+            os.makedirs(f'logs/{model}', exist_ok=True)
+            subprocess.run(["wget", url, "-O", f'logs/{model}/added_{model}.index'])
+        elif url.endswith('.zip'):
+            subprocess.run(["wget", url, "-O", f'downloads/{model}.zip'])
+        else:
+            if "drive.google.com" in url:
+                url = url.split('/')[0]
+                subprocess.run(["gdown", url, "--fuzzy", "-O", f'downloads/{model}'])
+            elif "mega.nz" in url:
+                Mega().download_url(url, 'downloads')
+            else:
+                subprocess.run(["wget", url, "-O", f'downloads/{model}'])
+
+        downloaded_file = next((f for f in os.listdir("downloads")), None)
+        if downloaded_file:
+            if downloaded_file.endswith(".zip"):
+                shutil.unpack_archive(f'downloads/{downloaded_file}', "unzips", 'zip')
+                for root, _, files in os.walk('unzips'):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        if file.endswith(".index"):
+                            os.makedirs(f'logs/{model}', exist_ok=True)
+                            shutil.copy2(file_path, f'logs/{model}')
+                        elif file.endswith(".pth") and "G_" not in file and "D_" not in file:
+                            shutil.copy(file_path, f'assets/weights/{model}.pth')
+            elif downloaded_file.endswith(".pth"):
+                shutil.copy(f'downloads/{downloaded_file}', f'assets/weights/{model}.pth')
+            elif downloaded_file.endswith(".index"):
+                os.makedirs(f'logs/{model}', exist_ok=True)
+                shutil.copy(f'downloads/{downloaded_file}', f'logs/{model}/added_{model}.index')
+            else:
+                gr.Warning("Failed to download file")
+                return 'Failed'
+
+        gr.Info("Done")
+    except Exception as e:
+        gr.Warning(f"There's been an error: {str(e)}")
+    finally:
+        shutil.rmtree("downloads", ignore_errors=True)
+        shutil.rmtree("unzips", ignore_errors=True)
+        shutil.rmtree("zip", ignore_errors=True)
+        return 'Done'
+
+
+
 with gr.Blocks(title="🗣️ NroGUI") as app:
-    gr.Markdown("♡NroGUI")
-    gr.Markdown(value=i18n("Guide Recommendations: (Enrops's) https://rentry.co/TrainingVoiceModels + (Litsa_the_dancer's) https://rentry.org/RVC_making-models"))
+    gr.Markdown("# 👊NroGUI")
     gr.Markdown(value=i18n("v2 is already selected when using this UI"))
     with gr.Tabs():
         with gr.TabItem(i18n("Inference")):
             with gr.Row():
                 sid0 = gr.Dropdown(label=i18n("Voice"), choices=sorted(names))
                 with gr.Column():
-                    refresh_button = gr.Button(i18n("Refresh"), variant="primary")
-                    clean_button = gr.Button(i18n("Unload Voice from VRAM"), variant="primary")
+                    with gr.Row():
+                        refresh_button = gr.Button(i18n("Refresh"), variant="primary")
+                        clean_button = gr.Button(i18n("Unload Voice from VRAM"), variant="primary")
                     with gr.Row():
                         but0 = gr.Button(i18n("Conversion"), variant="primary")
                 spk_item = gr.Slider(
