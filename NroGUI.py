@@ -642,6 +642,8 @@ with gr.Blocks(title="🗣️ NroGUI") as app:
                 with gr.Column():
                     refresh_button = gr.Button(i18n("Refresh"), variant="primary")
                     clean_button = gr.Button(i18n("Unload Voice from VRAM"), variant="primary")
+                    with gr.Row():
+                        but0 = gr.Button(i18n("Conversion"), variant="primary")
                 spk_item = gr.Slider(
                     minimum=0,
                     maximum=2333,
@@ -654,14 +656,15 @@ with gr.Blocks(title="🗣️ NroGUI") as app:
                 clean_button.click(
                     fn=clean, inputs=[], outputs=[sid0], api_name="infer_clean"
                 )
+                vc_transform0 = gr.Number(
+                    label=i18n("Transpose -12, 12 are octaves"),
+                    value=0
+                )
             with gr.TabItem(i18n("Single Inference")):
                 with gr.Group():
                     with gr.Row():
                         with gr.Column():
-                            vc_transform0 = gr.Number(
-                                label=i18n("Transpose -12, 12 are octaves"),
-                                value=0
-                            )
+                            
                             input_audio0 = gr.Textbox(
                                 label=i18n("Path to Audio file"),
                                 placeholder="%userprofile%\\Desktop\\covers\\audio_example.wav",
@@ -737,8 +740,7 @@ with gr.Blocks(title="🗣️ NroGUI") as app:
                             )
 
                 with gr.Group():
-                    with gr.Column():
-                        but0 = gr.Button(i18n("Conversion"), variant="primary")
+                    with gr.Column():  
                         with gr.Row():
                             vc_output1 = gr.Textbox(label=i18n("Output"))
                             vc_output2 = gr.Audio(label=i18n("Output Audio"))
